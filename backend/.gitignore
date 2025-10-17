@@ -1,0 +1,36 @@
+# Go backend .gitignore
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Output of build tools
+/build/
+/bin/
+
+# Dependency directories
+/vendor/
+
+# Go workspace file
+*.code-workspace
+
+# IDE/editor files
+.idea/
+.vscode/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# Go module files (keep go.mod and go.sum, ignore others)
+!go.mod
+!go.sum
