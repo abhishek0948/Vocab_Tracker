@@ -4,6 +4,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/abhishek0948/Vocab_Tracker/database"
+	"github.com/abhishek0948/Vocab_Tracker/routes"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -14,6 +17,8 @@ func main() {
 		log.Println("No .env file found")
 	}
 
+	database.Connect()
+	database.Migrate()
 
 	router := gin.Default()
 
@@ -24,6 +29,9 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
+
+	routes.AuthRoutes(router)
+	routes.VocabRoutes(router)
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"vocab-tracker-backend/config"
-	"vocab-tracker-backend/models"
+	"github.com/abhishek0948/Vocab_Tracker/config"
+	"github.com/abhishek0948/Vocab_Tracker/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
