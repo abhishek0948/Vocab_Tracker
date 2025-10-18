@@ -50,6 +50,36 @@ services:
       retries: 3
       start_period: 40s
 
+  # Vocabulary Service
+  vocabulary-service:
+    build:
+      context: ./vocabulary-service
+      dockerfile: Dockerfile
+    container_name: vocab-vocabulary-service
+    ports:
+      - "50052:50052"
+    environment:
+      DB_HOST: postgres
+      DB_USER: vocab_user
+      DB_PASSWORD: vocab_password
+      DB_NAME: vocab_tracker
+      DB_PORT: "5432"
+      JWT_SECRET: your-secret-key-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    networks:
+      - vocab-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50052 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # Broker Service (API Gateway)
   broker-service:
     build:

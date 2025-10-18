@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package vocabulary;
+
+option go_package = "github.com/vocal-tracker/vocabulary-service/proto";
+
+// Vocabulary service definition
+service VocabularyService {
+  // Get vocabularies with optional filtering
+  rpc GetVocabularies(GetVocabulariesRequest) returns (GetVocabulariesResponse);
+  
+  // Create a new vocabulary entry
+  rpc CreateVocabulary(CreateVocabularyRequest) returns (VocabularyResponse);
+  
+  // Update an existing vocabulary entry
+  rpc UpdateVocabulary(UpdateVocabularyRequest) returns (VocabularyResponse);
+  
+  // Delete a vocabulary entry
+  rpc DeleteVocabulary(DeleteVocabularyRequest) returns (DeleteVocabularyResponse);
+  
+  // Get vocabulary by ID
+  rpc GetVocabularyById(GetVocabularyByIdRequest) returns (VocabularyResponse);
+  
+  // Get vocabulary statistics
+  rpc GetVocabularyStats(GetVocabularyStatsRequest) returns (VocabularyStatsResponse);
+}
+
+// Request messages
+message GetVocabulariesRequest {
+  uint32 user_id = 1;
+  string date = 2;       // Optional: filter by date (YYYY-MM-DD)
+  string search = 3;     // Optional: search term
+  int32 limit = 4;       // Optional: limit results
+  int32 offset = 5;      // Optional: pagination offset
+}
+
+message CreateVocabularyRequest {
+  uint32 user_id = 1;
+  string word = 2;
+  string meaning = 3;
+  string example = 4;
+  string date = 5;       // YYYY-MM-DD format
+  string status = 6;     // Optional: defaults to "review_needed"
+}
+
+message UpdateVocabularyRequest {
+  uint32 vocabulary_id = 1;
+  uint32 user_id = 2;
+  string word = 3;
+  string meaning = 4;
+  string example = 5;
+  string status = 6;
+}
+
+message DeleteVocabularyRequest {
+  uint32 vocabulary_id = 1;
+  uint32 user_id = 2;
+}
+
+message GetVocabularyByIdRequest {
+  uint32 vocabulary_id = 1;
+  uint32 user_id = 2;
+}
+
+message GetVocabularyStatsRequest {
+  uint32 user_id = 1;
+  string date_from = 2;  // Optional: start date for stats
+  string date_to = 3;    // Optional: end date for stats
+}
+
+// Response messages
+message GetVocabulariesResponse {
+  bool success = 1;
+  string message = 2;
+  repeated Vocabulary vocabularies = 3;
+  int32 count = 4;
+  int32 total = 5;       // Total count (for pagination)
+}
+
+message VocabularyResponse {
+  bool success = 1;
+  string message = 2;
+  Vocabulary vocabulary = 3;
+}
+
+message DeleteVocabularyResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message VocabularyStatsResponse {
+  bool success = 1;
+  string message = 2;
+  int32 total_words = 3;
+  int32 words_this_week = 4;
+  int32 words_this_month = 5;
+  map<string, int32> status_counts = 6;  // Count by status
+  repeated DailyCount daily_counts = 7;   // Daily word counts
+}
+
+// Data models
+message Vocabulary {
+  uint32 id = 1;
+  uint32 user_id = 2;
+  string word = 3;
+  string meaning = 4;
+  string example = 5;
+  string date = 6;       // YYYY-MM-DD format
+  string status = 7;     // "review_needed", "learned", "mastered"
+  string created_at = 8; // RFC3339 format
+  string updated_at = 9; // RFC3339 format
+}
+
+message DailyCount {
+  string date = 1;       // YYYY-MM-DD format
+  int32 count = 2;
+}
