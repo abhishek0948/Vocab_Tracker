@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: vocab-postgres
+    environment:
+      POSTGRES_DB: vocab_tracker
+      POSTGRES_USER: vocab_user
+      POSTGRES_PASSWORD: vocab_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vocab-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vocab_user -d vocab_tracker && psql -U vocab_user -d vocab_tracker -c 'SELECT 1 FROM users LIMIT 1;' > /dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: vocab-auth-service
+    ports:
+      - "50051:50051"
+    environment:
+      DB_HOST: postgres
+      DB_USER: vocab_user
+      DB_PASSWORD: vocab_password
+      DB_NAME: vocab_tracker
+      DB_PORT: "5432"
+      JWT_SECRET: your-secret-key-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - vocab-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 50051 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vocab-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - broker-service
+    networks:
+      - vocab-network
+    restart: unless-stopped
+
+networks:
+  vocab-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

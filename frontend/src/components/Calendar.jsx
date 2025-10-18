@@ -9,6 +9,7 @@ const Calendar = ({ selectedDate, onDateSelect, vocabCounts = {} }) => {
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
+  // Calculate the number of empty cells needed at the beginning
   const startDay = getDay(monthStart);
   const emptyCells = Array(startDay).fill(null);
 

@@ -39,6 +39,7 @@ const Dashboard = () => {
       const response = await vocabAPI.getVocabulary(dateStr, searchTerm);
       setVocabularies(response.data.vocabularies);
       
+      // Calculate stats
       const vocab = response.data.vocabularies;
       const mastered = vocab.filter(v => v.status === 'mastered').length;
       const reviewNeeded = vocab.filter(v => v.status === 'review_needed').length;
@@ -57,12 +58,14 @@ const Dashboard = () => {
 
   const fetchVocabCounts = async () => {
     try {
+      // Fetch vocabulary for current month to get counts
       const response = await vocabAPI.getVocabulary('', '');
       const allVocab = response.data.vocabularies;
       
+      // Group by date
       const counts = {};
       allVocab.forEach(vocab => {
-        const date = vocab.date.split('T')[0];
+        const date = vocab.date.split('T')[0]; // Extract date part
         counts[date] = (counts[date] || 0) + 1;
       });
       
@@ -116,7 +119,7 @@ const Dashboard = () => {
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    setSearchTerm(''); 
+    setSearchTerm(''); // Clear search when changing dates
   };
 
   return (

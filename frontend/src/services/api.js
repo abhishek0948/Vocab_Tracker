@@ -9,6 +9,7 @@ const api = axios.create({
   },
 });
 
+// Add token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -17,6 +18,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle token expiration
 api.interceptors.response.use(
   (response) => response,
   (error) => {
