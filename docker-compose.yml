@@ -50,6 +50,32 @@ services:
       retries: 3
       start_period: 40s
 
+  # Broker Service (API Gateway)
+  broker-service:
+    build:
+      context: ./broker-service
+      dockerfile: Dockerfile
+    container_name: vocab-broker-service
+    ports:
+      - "8080:8080"
+    environment:
+      AUTH_SERVICE_HOST: auth-service
+      VOCAB_SERVICE_HOST: vocabulary-service
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      vocabulary-service:
+        condition: service_healthy
+    networks:
+      - vocab-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8080 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # Frontend
   frontend:
     build:
